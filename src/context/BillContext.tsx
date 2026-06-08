@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import type { AppState, Bill, Person, SplitMode } from "../types/types";
 import { generateId, calculateEqualSplit } from "../utils/helpers";
@@ -17,11 +17,30 @@ type BillContextType = {
 
 const BillContext = createContext<BillContextType | null>(null);
 
+const loadFromStorage = (): AppState => {
+  try {
+    const saved = localStorage.getItem("splitmate-bills");
+    if (saved) return JSON.parse(saved) as AppState;
+  } catch {
+    // if parsing fails just start fresh
+  }
+  return { bills: [], activeBillId: null };
+};
+
+const saveToStorage = (state: AppState) => {
+  try {
+    localStorage.setItem("splitmate-bills", JSON.stringify(state));
+  } catch {
+    // ignore storage errors
+  }
+};
+
 export const BillProvider = ({ children }: { children: ReactNode }) => {
-  const [state, setState] = useState<AppState>({
-    bills: [],
-    activeBillId: null,
-  });
+  const [state, setState] = useState<AppState>(loadFromStorage);
+
+  useEffect(() => {
+    saveToStorage(state);
+  }, [state]);
 
   const addBill = (title: string, total: number) => {
     const newBill: Bill = {
@@ -134,7 +153,17 @@ export const BillProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <BillContext.Provider
-      value={{ state, addBill, removeBill, setActiveBill, addPerson, removePerson, togglePaid, setSplitMode, updateCustomAmount }}
+      value={{
+        state,
+        addBill,
+        removeBill,
+        setActiveBill,
+        addPerson,
+        removePerson,
+        togglePaid,
+        setSplitMode,
+        updateCustomAmount,
+      }}
     >
       {children}
     </BillContext.Provider>

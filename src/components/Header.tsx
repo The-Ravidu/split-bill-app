@@ -1,4 +1,9 @@
+import { useBill } from "../context/BillContext";
+
 const Header = () => {
+  const { state } = useBill();
+  const totalBills = state.bills.length;
+
   return (
     <header
       className="w-full px-6 py-4 mb-8"
@@ -18,15 +23,26 @@ const Header = () => {
             SplitMate
           </span>
         </div>
-        <span
-          style={{
-            fontFamily: "monospace",
-            fontSize: "0.75rem",
-            color: "#666",
-          }}
-        >
-          split bills easily
-        </span>
+
+        <div className="flex items-center gap-3">
+          {totalBills > 0 && (
+            <span
+              className="text-xs px-2 py-1 rounded-full font-bold"
+              style={{ background: "#e8ff00", color: "#111" }}
+            >
+              {totalBills} {totalBills === 1 ? "bill" : "bills"}
+            </span>
+          )}
+          <span
+            style={{
+              fontFamily: "monospace",
+              fontSize: "0.75rem",
+              color: "#666",
+            }}
+          >
+            split bills easily
+          </span>
+        </div>
       </div>
     </header>
   );
