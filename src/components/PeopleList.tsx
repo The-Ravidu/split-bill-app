@@ -1,14 +1,15 @@
-import type { Person } from "../types/types";
+import type { Person, SplitMode } from "../types/types";
 import { useBill } from "../context/BillContext";
 
 type Props = {
   billId: string;
   people: Person[];
   total: number;
+  mode: SplitMode;
 };
 
-const PeopleList = ({ billId, people, total }: Props) => {
-  const { removePerson, togglePaid } = useBill();
+const PeopleList = ({ billId, people, total, mode }: Props) => {
+  const { removePerson, togglePaid, updateCustomAmount } = useBill();
 
   if (people.length === 0) {
     return (
@@ -41,10 +42,12 @@ const PeopleList = ({ billId, people, total }: Props) => {
                   background: person.paid ? "#22c55e" : "#fff",
                   borderColor: person.paid ? "#22c55e" : "#ccc",
                   color: "#fff",
+                  flexShrink: 0,
                 }}
               >
                 {person.paid ? "✓" : ""}
               </button>
+
               <div>
                 <p
                   className="text-sm font-semibold"
@@ -55,9 +58,29 @@ const PeopleList = ({ billId, people, total }: Props) => {
                 >
                   {person.name}
                 </p>
-                <p className="text-xs text-gray-400">
-                  €{person.amount.toFixed(2)}
-                </p>
+
+                {mode === "custom" ? (
+                  <div className="flex items-center gap-1 mt-1">
+                    <span className="text-xs text-gray-400">€</span>
+                    <input
+                      type="number"
+                      value={person.amount}
+                      min="0"
+                      onChange={(e) =>
+                        updateCustomAmount(
+                          billId,
+                          person.id,
+                          parseFloat(e.target.value) || 0
+                        )
+                      }
+                      className="w-20 p-1 text-xs border rounded"
+                    />
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400">
+                    €{person.amount.toFixed(2)}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -73,9 +96,9 @@ const PeopleList = ({ billId, people, total }: Props) => {
       </div>
 
       {remaining !== 0 && (
-        <p className="text-xs text-center" style={{ color: "#f59e0b" }}>
+        <p className="text-xs text-center py-2 rounded" style={{ color: "#f59e0b", background: "#fffbeb" }}>
           ⚠ €{Math.abs(remaining).toFixed(2)}{" "}
-          {remaining > 0 ? "unassigned" : "over assigned"}
+          {remaining > 0 ? "still unassigned" : "over the total"}
         </p>
       )}
     </div>

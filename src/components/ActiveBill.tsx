@@ -1,9 +1,14 @@
+import { useState } from "react";
 import { useBill } from "../context/BillContext";
+import type { SplitMode } from "../types/types";
 import AddPerson from "./AddPerson";
 import PeopleList from "./PeopleList";
+import SplitToggle from "./SplitToggle";
+import Summary from "./Summary";
 
 const ActiveBill = () => {
-  const { state } = useBill();
+  const { state, setSplitMode } = useBill();
+  const [mode, setMode] = useState<SplitMode>("equal");
 
   const activeBill = state.bills.find((b) => b.id === state.activeBillId);
 
@@ -20,6 +25,11 @@ const ActiveBill = () => {
       </div>
     );
   }
+
+  const handleModeChange = (newMode: SplitMode) => {
+    setMode(newMode);
+    setSplitMode(activeBill.id, newMode);
+  };
 
   const paidCount = activeBill.people.filter((p) => p.paid).length;
 
@@ -42,22 +52,26 @@ const ActiveBill = () => {
           </p>
         </div>
 
-        {activeBill.people.length > 0 && paidCount === activeBill.people.length && (
-          <span
-            className="text-xs px-3 py-1 rounded-full font-bold"
-            style={{ background: "#e8ff00", color: "#111" }}
-          >
-            ✓ All paid!
-          </span>
-        )}
+        {activeBill.people.length > 0 &&
+          paidCount === activeBill.people.length && (
+            <span
+              className="text-xs px-3 py-1 rounded-full font-bold"
+              style={{ background: "#e8ff00", color: "#111" }}
+            >
+              ✓ All paid!
+            </span>
+          )}
       </div>
 
       <AddPerson billId={activeBill.id} />
+      <SplitToggle mode={mode} onChange={handleModeChange} />
       <PeopleList
         billId={activeBill.id}
         people={activeBill.people}
         total={activeBill.total}
+        mode={mode}
       />
+      <Summary bill={activeBill} />
     </div>
   );
 };
