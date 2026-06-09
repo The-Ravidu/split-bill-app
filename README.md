@@ -1,15 +1,20 @@
-# SplitMate
+# SplitMate 🧾
 
-A simple bill splitting app built with React and TypeScript.
+A bill splitting app built with React and TypeScript. Add a bill, add people, split equally or set custom amounts, and track who has paid.
 
 ## Setup
 
 npm install
 npm run dev
 
-## Features (in progress)
+## Tests
 
-- Add a bill with a total amount
-- Add people to split with
-- Split equally or set custom amounts
-- See a clear summary of who owes what
+npm run test
+
+## Built with
+
+- React 19
+- TypeScript
+- Vite
+- Tailwind CSS
+- localStorage for persistence
